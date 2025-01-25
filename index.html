@@ -1,1 +1,139 @@
-<div><!DOCTYPE html><br/><html lang="es"><br/><head><br/>    <meta charset="UTF-8"><br/>    <meta name="viewport" content="width=device-width, initial-scale=1.0"><br/>    <title>Gestión de Ingresos</title><br/>    <link rel="stylesheet" href="styles.css"><br/></head><br/><body><br/>    <div id="app"><br/>        <h1>Gestión de Ingresos</h1><br/>        <br/>        <div id="input-section"><br/>            <h2>Registro Diario</h2><br/>            <form id="daily-form"><br/>                <input type="date" id="date" required><br/>                <input type="time" id="start-time" required><br/>                <input type="time" id="end-time" required><br/>                <input type="number" id="discounts" placeholder="Descuentos" step="0.01"><br/>                <input type="number" id="extras" placeholder="Extras" step="0.01"><br/>                <button type="submit">Agregar Registro</button><br/>            </form><br/>        </div><div></div>        <div id="weekly-summary"><br/>            <h2>Resumen Semanal</h2><br/>            <div id="week-navigation"><br/>                <button id="prev-week">Semana Anterior</button><br/>                <span id="current-week"></span><br/>                <button id="next-week">Semana Siguiente</button><br/>            </div><br/>            <div id="summary-data"></div><br/>        </div><div></div>        <div id="records-table"><br/>            <h2>Registros</h2><br/>            <table><br/>                <thead><br/>                    <tr><br/>                        <th>Fecha</th><br/>                        <th>Día</th><br/>                        <th>HE</th><br/>                        <th>HS</th><br/>                        <th>Ganancia</th><br/>                        <th>Descuentos</th><br/>                        <th>Extras</th><br/>                        <th>Acciones</th><br/>                    </tr><br/>                </thead><br/>                <tbody id="records-body"></tbody><br/>            </table><br/>        </div><div></div>        <div id="charts"><br/>            <h2>Gráficos</h2><br/>            <canvas id="weekly-earnings-chart"></canvas><br/>            <canvas id="discounts-extras-chart"></canvas><br/>        </div><br/>    </div><div></div>    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script><br/>    <script src="script.js"></script><br/></body><br/></html></div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculadora de Dinero</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .section {
+            background-color: #f4f4f4;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        input {
+            width: 80px;
+            margin: 5px;
+            padding: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #result {
+            font-weight: bold;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Calculadora de Dinero 💵</h1>
+
+    <div class="section">
+        <h2>Calcular Total de Dinero</h2>
+        <div>
+            <label>Billetes de $20:</label>
+            <input type="number" id="bill20" min="0" value="0">
+            <label>Billetes de $10:</label>
+            <input type="number" id="bill10" min="0" value="0">
+            <label>Billetes de $5:</label>
+            <input type="number" id="bill5" min="0" value="0">
+        </div>
+        <div>
+            <label>Monedas de $1:</label>
+            <input type="number" id="coin1" min="0" value="0">
+            <label>Monedas de 50¢:</label>
+            <input type="number" id="coin50" min="0" value="0">
+            <label>Monedas de 25¢:</label>
+            <input type="number" id="coin25" min="0" value="0">
+            <label>Monedas de 10¢:</label>
+            <input type="number" id="coin10" min="0" value="0">
+            <label>Monedas de 5¢:</label>
+            <input type="number" id="coin5" min="0" value="0">
+            <label>Monedas de 1¢:</label>
+            <input type="number" id="coin1c" min="0" value="0">
+        </div>
+        <button onclick="calcularTotal()">Calcular Total</button>
+        <div id="totalResult"></div>
+    </div>
+
+    <div class="section">
+        <h2>Descomponer Cantidad</h2>
+        <input type="number" id="amountToBreakdown" min="0" step="0.01" placeholder="Monto en dólares">
+        <button onclick="descomponerCantidad()">Descomponer</button>
+        <div id="breakdownResult"></div>
+    </div>
+
+    <script>
+        function calcularTotal() {
+            const billetes = {
+                20: parseInt(document.getElementById('bill20').value) * 20,
+                10: parseInt(document.getElementById('bill10').value) * 10,
+                5: parseInt(document.getElementById('bill5').value) * 5
+            };
+
+            const monedas = {
+                1: parseInt(document.getElementById('coin1').value) * 1,
+                0.5: parseInt(document.getElementById('coin50').value) * 0.50,
+                0.25: parseInt(document.getElementById('coin25').value) * 0.25,
+                0.1: parseInt(document.getElementById('coin10').value) * 0.10,
+                0.05: parseInt(document.getElementById('coin5').value) * 0.05,
+                0.01: parseInt(document.getElementById('coin1c').value) * 0.01
+            };
+
+            const totalBilletes = Object.values(billetes).reduce((a, b) => a + b, 0);
+            const totalMonedas = Object.values(monedas).reduce((a, b) => a + b, 0);
+            const total = totalBilletes + totalMonedas;
+
+            document.getElementById('totalResult').innerHTML = `Total: $${total.toFixed(2)}`;
+        }
+
+        function descomponerCantidad() {
+            const monto = parseFloat(document.getElementById('amountToBreakdown').value);
+            if (isNaN(monto) || monto <= 0) {
+                document.getElementById('breakdownResult').innerHTML = 'Por favor ingrese un monto válido';
+                return;
+            }
+
+            const denominaciones = [
+                { valor: 20, nombre: 'billetes de $20' },
+                { valor: 10, nombre: 'billetes de $10' },
+                { valor: 5, nombre: 'billetes de $5' },
+                { valor: 1, nombre: 'monedas de $1' },
+                { valor: 0.50, nombre: 'monedas de 50¢' },
+                { valor: 0.25, nombre: 'monedas de 25¢' },
+                { valor: 0.10, nombre: 'monedas de 10¢' },
+                { valor: 0.05, nombre: 'monedas de 5¢' },
+                { valor: 0.01, nombre: 'monedas de 1¢' }
+            ];
+
+            let montoRestante = monto;
+            let desglose = [];
+
+            denominaciones.forEach(denom => {
+                const cantidad = Math.floor(montoRestante / denom.valor);
+                if (cantidad > 0) {
+                    desglose.push(`${cantidad} ${denom.nombre}`);
+                    montoRestante = parseFloat((montoRestante % denom.valor).toFixed(2));
+                }
+            });
+
+            document.getElementById('breakdownResult').innerHTML = 
+                desglose.length > 0 
+                ? `Desglose de $${monto}:<br>${desglose.join('<br>')}` 
+                : 'No se puede descomponer';
+        }
+    </script>
+</body>
+</html>
